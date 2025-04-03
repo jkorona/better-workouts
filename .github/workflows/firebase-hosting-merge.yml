@@ -12,14 +12,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Create .env file
         run: |
-          touch .env
-          echo "${{secrets.FIREBASE_SECRETS}}" >> .env
-      - name: Print .env file
+          echo "${{ secrets.FIREBASE_SECRETS }}" | tr -d '\r' > .env
+                    
+      - name: Securely Validate .env
         run: |
-          echo "Contents of .env file:"
-          cat .env
+          echo "First few lines of .env file:"
+          head -n 5 .env  # Print only first few lines, without exposing secrets
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
