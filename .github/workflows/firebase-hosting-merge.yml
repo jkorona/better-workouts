@@ -7,7 +7,7 @@ on:
     branches:
       - main
 jobs:
-  using_github_secrets:
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -27,10 +27,6 @@ jobs:
           echo "${{ secrets.FIREBASE_SECRETS }}" | tr -d '\r' > .env
           ls -lah .env  # Check if file exists
 
-  build_and_deploy:
-    runs-on: ubuntu-latest
-    needs: using_github_secrets
-    steps:
       - run: npm install && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
