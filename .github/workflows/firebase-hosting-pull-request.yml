@@ -8,22 +8,32 @@ permissions:
   contents: read
   pull-requests: write
 jobs:
-  using_github_secrets:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Create .env file
-        run: |
-          touch .env
-          echo "${{secrets.FIREBASE_SECRETS}}" >> .env
   build_and_preview:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: npm install && npm run build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Debug Secret
+        run: |
+          if [[ -z "${{ secrets.FIREBASE_SECRETS }}" ]]; then
+            echo "🔥 FIREBASE_SECRETS is EMPTY or NOT SET!"
+            exit 1
+          else
+            echo "✅ FIREBASE_SECRETS is available."
+          fi
+
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.FIREBASE_SECRETS }}" | tr -d '\r' > .env
+          ls -lah .env  # Check if file exists
+
+      - name: Install dependencies and build
+        run: npm install && npm run build
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BETTER_WORKOUTS }}
