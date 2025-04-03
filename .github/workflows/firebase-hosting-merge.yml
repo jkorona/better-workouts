@@ -12,11 +12,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Create .env file
         run: |
           set -x  # Enable debugging
-          echo "TEST=FOO" | tr -d '\r' > .env
+          echo "${{ secrets.FIREBASE_SECRETS }}" | tr -d '\r' > .env
           ls -lah .env  # Check if file exists
           cat .env  # Print file contents (⚠️ Remove this in production)
 
