@@ -13,14 +13,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Debug Secret (Check If It's Passed)
+        run: |
+          if [[ -z "${{ secrets.FIREBASE_SECRETS }}" ]]; then
+            echo "🔥 FIREBASE_SECRETS is EMPTY or NOT SET!"
+            exit 1
+          else
+            echo "✅ FIREBASE_SECRETS exists!"
+          fi
+
       - name: Create .env file
         run: |
+          set -x  # Enable debugging
           echo "${{ secrets.FIREBASE_SECRETS }}" | tr -d '\r' > .env
-                    
-      - name: Securely Validate .env
-        run: |
-          echo "First few lines of .env file:"
-          head -n 5 .env  # Print only first few lines, without exposing secrets
+          ls -lah .env  # Check if file exists
+          cat .env  # Print file contents (⚠️ Remove this in production)
+          
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
